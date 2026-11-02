@@ -904,3 +904,21 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-knobcolor.is-phone { height: 38px; }
   .cs-knobcolor.is-phone .cs-knobcolor__seg { padding: 8px 2px 0; min-height: 38px; }
 }
+.cs-home {
+  position: fixed; top: 32px; left: 40px; z-index: 20;
+  display: flex; align-items: center; height: 46px; padding: 0 14px; border-radius: 999px;
+  color: #e8e8e8; text-decoration: none; font-family: var(--cs-font-text); font-size: clamp(13px, 0.95vw, 16px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.01));
+  backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 1px solid rgba(255,255,255,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: border-color 0.2s, background 0.2s;
+}
+.cs-home svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cs-home span { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.35s ease, opacity 0.25s ease, margin-left 0.35s ease; }
+.cs-home:hover, .cs-home:focus-visible { border-color: rgba(255,255,255,0.4); background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); color: #fff; }
+.cs-home:hover span, .cs-home:focus-visible span { max-width: 12em; opacity: 1; margin-left: 10px; }
+
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+  .cs-home { top: 6px; left: max(6px, env(safe-area-inset-left)); height: 32px; padding: 0 8px; }
+  .cs-home svg { width: 16px; height: 16px; }
+}

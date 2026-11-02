@@ -5,8 +5,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { gsap } from 'gsap';
 
@@ -24,7 +22,6 @@ const state = {
   simulationAck: false,
 };
 
-let hasSelectedGuitar = false;
 let vibratoApplied = null;
 let currentStep = 0;
 
@@ -39,20 +36,12 @@ function effTreatment() {
 }
 const TOTAL_STEPS = 9;
 
-let debugMode = false;
-let orbitControls = null;
-
-let transformMode = false;
-let transformControls = null;
-let transformTargetKey = null;
-
 let hasPresentedInStandSession = false;
 let s1Zoom = 1;
 const s1Pan = new THREE.Vector3();
 let zoomAnchor = null;
 const panVec = new THREE.Vector3();
 let baseDist = 8;
-let userZoom = 1;
 let bgScaleCur = 1.4;
 const bgEl = document.querySelector('.cs-bg');
 
@@ -184,8 +173,6 @@ const studioSpots = [0, 1, 2].map(() => {
   return spot;
 });
 let studioLightingOn = false;
-const studioStandCenter = new THREE.Vector3();
-let studioStandD = 3;
 let lightingInitialized = false;
 let lightingTween = null;
 
@@ -244,8 +231,6 @@ function applyLightingMode(mode, duration = 0) {
 
 function positionStudioSpots(center, size) {
   const d = Math.max(size.x, size.y, size.z) || 3;
-  studioStandCenter.copy(center);
-  studioStandD = d;
   const aim = center.clone();
   aim.y += size.y * 0.15;
 
@@ -259,12 +244,7 @@ function positionStudioSpots(center, size) {
       spot.intensity = spot.userData.studioIntensity;
     }
   });
-  console.log('Studio spots placed around stand -- center:', center.toArray().map((n) => +n.toFixed(2)), 'size:', size.toArray().map((n) => +n.toFixed(2)));
 }
-
-const axesHelper = new THREE.AxesHelper(3);
-axesHelper.visible = false;
-guitarGroup.add(axesHelper);
 
 const ORIENTATION_AXIS = 'z';
 
@@ -435,14 +415,10 @@ function loadBodyPiece(path) {
     originalMaps = [];
 
     gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Body piece node:', child.name || '(unnamed)', child.type);
-      }
       if (child.isMesh && child.material) {
         upgradeBodyMaterials(child);
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach((m) => {
-          console.log('  Body piece material:', m.name || '(unnamed)');
           const nameLower = (m.name || '').toLowerCase();
           if (nameLower.startsWith('body') || nameLower.startsWith('side') || nameLower.startsWith('base')) {
             bodyMaterials.push(m);
@@ -464,13 +440,6 @@ function loadBodyPiece(path) {
 function loadNeckPiece(path) {
   loadPieceIntoGroup(neckPieceGroup, path, (gltf) => {
     gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Neck piece node:', child.name || '(unnamed)', child.type);
-      }
-      if (child.isMesh && child.material) {
-        const mats = Array.isArray(child.material) ? child.material : [child.material];
-        mats.forEach((m) => console.log('  Neck piece material:', m.name || '(unnamed)'));
-      }
     });
   });
 }
@@ -491,11 +460,6 @@ function loadAllStandGuitars() {
       standSpinGroups[key].position.copy(center);
       standSpinGroups[key].rotation.set(0, 0, 0);
 
-      gltf.scene.traverse((child) => {
-        if (child.isMesh || child.isGroup) {
-          console.log(`Stand guitar node (${key}):`, child.name || '(unnamed)', child.type);
-        }
-      });
 
       if (key === 'les-paul') styleStandLesPaul(gltf.scene);
     }, IDENTITY_TRANSFORM);
@@ -546,10 +510,6 @@ function ensureShowroomLoaded() {
     gltf.scene.traverse((child) => {
       if (child.isLight) embeddedLights.push(child);
     });
-    console.log(
-      `Showroom embedded lights: ${embeddedLights.length}`,
-      embeddedLights.map((l) => `${l.type} intensity=${l.intensity}`)
-    );
     if (STRIP_SHOWROOM_LIGHTS) embeddedLights.forEach((l) => l.parent?.remove(l));
 
     gltf.scene.traverse((child) => {
@@ -559,9 +519,6 @@ function ensureShowroomLoaded() {
           m.transparent = true;
           m.opacity = showroomOpacityTarget;
           showroomMaterials.push(m);
-          console.log(
-            `Showroom material "${m.name || '(unnamed)'}" -- map: ${!!m.map}, roughnessMap: ${!!m.roughnessMap}, normalMap: ${!!m.normalMap}`
-          );
         });
       }
     });
@@ -642,7 +599,6 @@ function runWhenLoaderDone(fn) {
 
 function enterStandMode() {
   guitarGroup.clear();
-  guitarGroup.add(axesHelper);
   guitarGroup.add(standGroup);
   Object.values(standGuitarGroups).forEach((g) => guitarGroup.add(g));
 
@@ -655,11 +611,6 @@ function enterStandMode() {
       positionStudioSpots(box.getCenter(new THREE.Vector3()), box.getSize(new THREE.Vector3()));
     }
 
-    gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Stand node:', child.name || '(unnamed)', child.type);
-      }
-    });
   }, IDENTITY_TRANSFORM);
 
   loadAllStandGuitars();
@@ -684,14 +635,10 @@ function loadHardwareBase(path) {
     propMaterials = [];
 
     gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Hardware base node:', child.name || '(unnamed)', child.type);
-      }
       if (child.isMesh && child.material) {
         upgradeBodyMaterials(child);
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach((m) => {
-          console.log('  Hardware base material:', m.name || '(unnamed)');
           const nameLower = (m.name || '').toLowerCase();
           if (nameLower.startsWith('body') || nameLower.startsWith('side') || nameLower.startsWith('base')) {
             bodyMaterials.push(m);
@@ -725,9 +672,6 @@ function loadKnobPiece(path) {
     knobMaterials = [];
     knobFollowsPlating = path === KNOB_MODELS['gold-th'] || path === KNOB_MODELS['black-wh'];
     gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Knob piece node:', child.name || '(unnamed)', child.type);
-      }
       if (child.isMesh && child.material) {
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach((m) => {
@@ -751,9 +695,6 @@ function loadVibratoPiece(path) {
   loadPieceIntoGroup(vibratoPieceGroup, path, (gltf) => {
     vibratoMaterials = [];
     gltf.scene.traverse((child) => {
-      if (child.isMesh || child.isGroup) {
-        console.log('Vibrato piece node:', child.name || '(unnamed)', child.type);
-      }
       if (child.isMesh && child.material) {
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach((m) => vibratoMaterials.push(m));
@@ -765,7 +706,6 @@ function loadVibratoPiece(path) {
 
 function enterHardwareMode() {
   guitarGroup.clear();
-  guitarGroup.add(axesHelper);
   guitarGroup.add(hardwareBaseGroup);
   guitarGroup.add(knobPieceGroup);
   loadHardwareBase(state.vibrato ? CORDLESS_KNOBLESS_BASE : KNOBLESS_BASE);
@@ -794,7 +734,6 @@ function setVibrato(finish) {
 
 function enterBodyOnlyMode() {
   guitarGroup.clear();
-  guitarGroup.add(axesHelper);
   guitarGroup.add(bodyPieceGroup);
   loadBodyPiece(BODY_MODEL);
 }
@@ -846,7 +785,6 @@ renderer.domElement.style.touchAction = 'none';
 renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
 
 renderer.domElement.addEventListener('pointerdown', (e) => {
-  if (debugMode || transformMode) return;
   if (e.button === 1) return;
   if (isDragging) return;
   isDragging = true;
@@ -875,7 +813,7 @@ window.addEventListener('pointerup', endDrag);
 window.addEventListener('pointercancel', endDrag);
 
 window.addEventListener('pointermove', (e) => {
-  if (debugMode || transformMode || !isDragging || e.pointerId !== activePointerId) return;
+  if (!isDragging || e.pointerId !== activePointerId) return;
   let dx = e.clientX - prevPointer.x;
   let dy = e.clientY - prevPointer.y;
   prevPointer = { x: e.clientX, y: e.clientY };
@@ -976,7 +914,6 @@ camera.lookAt(lookAtTarget);
 function focusStep(stepNum) {
   const region = getRegionForStep(stepNum);
   if (!region) return;
-  userZoom = 1;
   zoomAnchor = null;
   panVec.set(0, 0, 0);
   baseDist = new THREE.Vector3(...region.camPos).distanceTo(new THREE.Vector3(...region.lookAt));
@@ -1042,12 +979,6 @@ function animate() {
 
   updateStageFraming();
 
-  if (debugMode) {
-    orbitControls.update();
-    updateDebugHud();
-    renderer.render(scene, camera);
-    return;
-  }
 
   const rotationTarget = getRotationTarget();
   if (rotationTarget) {
@@ -1127,7 +1058,6 @@ function showStep(stepNum) {
   const doModeSwap = () => {
   if (prevMode !== nextMode) {
     if (prevMode === 'stand' && nextMode !== 'stand') {
-      if (transformMode) disableTransformMode();
       fadeShowroom(0, leavingStand ? 0.05 : 1.2);
       applyLightingMode('standard', 0.9);
     }
@@ -1161,7 +1091,6 @@ function showStep(stepNum) {
       modeTL = null;
       doModeSwap();
       const r = getRegionForStep(currentStep);
-      userZoom = 1;
       zoomAnchor = null;
       panVec.set(0, 0, 0);
       if (r) {
@@ -1408,7 +1337,6 @@ function zoomBy(step) {
 window.addEventListener(
   'wheel',
   (e) => {
-    if (debugMode) return;
     if (e.target.closest && e.target.closest('textarea, .cs-panel__scroll, .cs-panel')) return;
     if (e.ctrlKey) {
       e.preventDefault();
@@ -1437,7 +1365,7 @@ window.addEventListener('gestureend', (e) => e.preventDefault());
 
 let midPan = null;
 renderer.domElement.addEventListener('pointerdown', (e) => {
-  if (e.button !== 1 || debugMode) return;
+  if (e.button !== 1) return;
   e.preventDefault();
   midPan = { id: e.pointerId, x: e.clientX, y: e.clientY };
   renderer.domElement.setPointerCapture?.(e.pointerId);
@@ -1502,7 +1430,6 @@ selectBtn.addEventListener('click', () => {
   if (!MODELS[modelIndex].available) return;
   window.dispatchEvent(new Event('cs-guitar-selected'));
   state.guitar = MODELS[modelIndex].key;
-  hasSelectedGuitar = true;
   updateSummary();
   showStep(2);
 });
@@ -2256,315 +2183,6 @@ function updateSummary() {
 
 showStep(1);
 updateSummary();
-
-const debugHud = document.createElement('div');
-debugHud.style.cssText = `
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 999;
-  background: rgba(0,0,0,0.85);
-  color: #7CFC7C;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  padding: 14px 18px;
-  border-radius: 8px;
-  white-space: pre;
-  pointer-events: none;
-  border: 1px solid #333;
-`;
-document.body.appendChild(debugHud);
-
-function updateDebugHud() {
-  const p = camera.position;
-  const t = orbitControls.target;
-  debugHud.textContent =
-    `DEBUG MODE -- step ${currentStep} -- orientation: ${orientation}\n` +
-    `camPos:  [${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)}]\n` +
-    `lookAt:  [${t.x.toFixed(2)}, ${t.y.toFixed(2)}, ${t.z.toFixed(2)}]\n` +
-    `fov:     ${camera.fov.toFixed(1)}\n\n` +
-    `[D] exit debug mode   [C] copy region to clipboard`;
-}
-
-function enableDebugMode() {
-  if (transformMode) disableTransformMode();
-
-  debugMode = true;
-  axesHelper.visible = true;
-  debugHud.style.display = 'block';
-
-  orbitControls = new OrbitControls(camera, renderer.domElement);
-  orbitControls.target.copy(lookAtTarget);
-  orbitControls.enableDamping = true;
-  orbitControls.update();
-}
-
-function disableDebugMode() {
-  debugMode = false;
-  axesHelper.visible = false;
-  debugHud.style.display = 'none';
-  orbitControls?.dispose();
-  orbitControls = null;
-}
-
-function copyRegionToClipboard() {
-  if (!debugMode) return;
-  const p = camera.position;
-  const t = orbitControls.target;
-  const snippet =
-    `${currentStep}: { camPos: [${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)}], ` +
-    `lookAt: [${t.x.toFixed(2)}, ${t.y.toFixed(2)}, ${t.z.toFixed(2)}], fov: ${camera.fov.toFixed(1)} },`;
-
-  navigator.clipboard?.writeText(snippet).then(() => {
-    console.log('Copied to clipboard:', snippet);
-  }).catch(() => {
-    console.log('Clipboard copy failed -- here it is manually:', snippet);
-  });
-}
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'd' || e.key === 'D') {
-    debugMode ? disableDebugMode() : enableDebugMode();
-  }
-  if ((e.key === 'c' || e.key === 'C') && debugMode) {
-    copyRegionToClipboard();
-  }
-});
-
-const transformHud = document.createElement('div');
-transformHud.style.cssText = `
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999;
-  background: rgba(0,0,0,0.85);
-  color: #7CD8FF;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  padding: 14px 18px;
-  border-radius: 8px;
-  white-space: pre;
-  pointer-events: none;
-  border: 1px solid #333;
-`;
-document.body.appendChild(transformHud);
-
-const SPOT_KEYS = ['spot1', 'spot2', 'spot3'];
-const isSpotKey = (key) => SPOT_KEYS.includes(key);
-const fmt3 = (arr) => `[${arr.map((n) => n.toFixed(2)).join(', ')}]`;
-
-function getTransformObject(key) {
-  if (key === 'room') return showroomGroup;
-  if (isSpotKey(key)) return studioSpots[SPOT_KEYS.indexOf(key)];
-  return standGuitarGroups[key];
-}
-function getTransformKeys() {
-  return [...Object.keys(standGuitarGroups), 'room', ...SPOT_KEYS];
-}
-
-function spotOffset(spot) {
-  return [
-    (spot.position.x - studioStandCenter.x) / studioStandD,
-    (spot.position.y - studioStandCenter.y) / studioStandD,
-    (spot.position.z - studioStandCenter.z) / studioStandD,
-  ];
-}
-
-function refreshSpotIntensity(spot) {
-  const dist = spot.position.distanceTo(spot.target.position);
-  spot.userData.studioIntensity = STUDIO_SPOT_LUX * dist * dist;
-  if (studioLightingOn && !(lightingTween && lightingTween.isActive())) {
-    spot.intensity = spot.userData.studioIntensity;
-  }
-}
-
-let spotMarkers = [];
-
-function buildSpotMarkers() {
-  const radius = Math.max(studioStandD * 0.04, 0.05);
-  const markerMaterial = (extra = {}) => ({
-    color: 0xffe9a8,
-    toneMapped: false,
-    depthTest: false,
-    transparent: true,
-    ...extra,
-  });
-
-  studioSpots.forEach((spot) => {
-    const sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(radius, 16, 12),
-      new THREE.MeshBasicMaterial(markerMaterial())
-    );
-    sphere.renderOrder = 999;
-    spot.add(sphere);
-
-    const line = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
-      new THREE.LineBasicMaterial(markerMaterial({ opacity: 0.6 }))
-    );
-    line.renderOrder = 999;
-    line.frustumCulled = false;
-    positionGroup.add(line);
-
-    spotMarkers.push({ spot, sphere, line });
-  });
-  updateSpotMarkers();
-}
-
-function updateSpotMarkers() {
-  spotMarkers.forEach(({ spot, line }) => {
-    const pos = line.geometry.attributes.position;
-    pos.setXYZ(0, spot.position.x, spot.position.y, spot.position.z);
-    pos.setXYZ(1, spot.target.position.x, spot.target.position.y, spot.target.position.z);
-    pos.needsUpdate = true;
-  });
-}
-
-function removeSpotMarkers() {
-  spotMarkers.forEach(({ spot, sphere, line }) => {
-    spot.remove(sphere);
-    sphere.geometry.dispose();
-    sphere.material.dispose();
-    positionGroup.remove(line);
-    line.geometry.dispose();
-    line.material.dispose();
-  });
-  spotMarkers = [];
-}
-
-function updateTransformHud() {
-  const g = getTransformObject(transformTargetKey);
-  if (!g) return;
-
-  if (isSpotKey(transformTargetKey)) {
-    transformHud.textContent =
-      `TRANSFORM MODE -- target: ${transformTargetKey} (light)\n` +
-      `mode: translate (lights only move)\n` +
-      `offset:   ${fmt3(spotOffset(g))}  (x stand size, from stand center)\n` +
-      `position: ${fmt3(g.position.toArray())}\n\n` +
-      `[G] move   [L] next light   [[ ]] switch target\n` +
-      `[C] copy all light offsets   [T] exit`;
-    return;
-  }
-
-  transformHud.textContent =
-    `TRANSFORM MODE -- target: ${transformTargetKey}\n` +
-    `mode: ${transformControls.getMode()}\n` +
-    `position: ${fmt3(g.position.toArray())}\n` +
-    `rotation: ${fmt3([g.rotation.x, g.rotation.y, g.rotation.z])}\n\n` +
-    `[G] move   [R] rotate   [L] lights   [[ ]] switch target\n` +
-    `[C] copy   [T] exit`;
-}
-
-function onTransformChange() {
-  if (isSpotKey(transformTargetKey)) {
-    refreshSpotIntensity(getTransformObject(transformTargetKey));
-    updateSpotMarkers();
-  }
-  updateTransformHud();
-}
-
-function attachTransformTarget(key) {
-  transformTargetKey = key;
-  const obj = getTransformObject(key);
-  if (obj && transformControls) {
-    transformControls.attach(obj);
-    if (isSpotKey(key)) transformControls.setMode('translate');
-  }
-  updateTransformHud();
-}
-
-function enableTransformMode() {
-  if (currentStep !== 1) return;
-  if (debugMode) disableDebugMode();
-
-  transformMode = true;
-  transformHud.style.display = 'block';
-
-  transformControls = new TransformControls(camera, renderer.domElement);
-  transformControls.setMode('translate');
-  transformControls.addEventListener('change', onTransformChange);
-
-  const helper = transformControls.getHelper ? transformControls.getHelper() : transformControls;
-  scene.add(helper);
-  transformControls.__helper = helper;
-
-  buildSpotMarkers();
-  attachTransformTarget(MODELS[modelIndex]?.key || Object.keys(standGuitarGroups)[0]);
-}
-
-function disableTransformMode() {
-  transformMode = false;
-  transformHud.style.display = 'none';
-  removeSpotMarkers();
-  if (transformControls) {
-    transformControls.detach();
-    scene.remove(transformControls.__helper);
-    transformControls.dispose();
-    transformControls = null;
-  }
-}
-
-function copyTransformToClipboard() {
-  if (!transformMode) return;
-
-  let snippet;
-  if (isSpotKey(transformTargetKey)) {
-    snippet =
-      'const STUDIO_SPOT_OFFSETS = [\n' +
-      studioSpots.map((spot) => `  ${fmt3(spotOffset(spot))},`).join('\n') +
-      '\n];';
-  } else {
-    const g = getTransformObject(transformTargetKey);
-    if (!g) return;
-    snippet =
-      `position: ${fmt3(g.position.toArray())}, ` +
-      `rotation: ${fmt3([g.rotation.x, g.rotation.y, g.rotation.z])}`;
-  }
-
-  navigator.clipboard?.writeText(snippet).then(() => {
-    console.log('Copied to clipboard:\n' + snippet);
-  }).catch(() => {
-    console.log('Clipboard copy failed -- here it is manually:\n' + snippet);
-  });
-}
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 't' || e.key === 'T') {
-    transformMode ? disableTransformMode() : enableTransformMode();
-    return;
-  }
-  if (!transformMode) return;
-
-  if (e.key === 'g' || e.key === 'G') {
-    transformControls.setMode('translate');
-    updateTransformHud();
-  }
-  if (e.key === 'r' || e.key === 'R') {
-    if (isSpotKey(transformTargetKey)) return;
-    transformControls.setMode('rotate');
-    updateTransformHud();
-  }
-  if (e.key === 'c' || e.key === 'C') {
-    copyTransformToClipboard();
-  }
-  if (e.key === 'l' || e.key === 'L') {
-    const i = SPOT_KEYS.indexOf(transformTargetKey);
-    attachTransformTarget(SPOT_KEYS[(i + 1) % SPOT_KEYS.length]);
-  }
-  if (e.key === '[' || e.key === ']') {
-    const keys = getTransformKeys();
-    const idx = keys.indexOf(transformTargetKey);
-    const nextIdx = e.key === '['
-      ? (idx - 1 + keys.length) % keys.length
-      : (idx + 1) % keys.length;
-    attachTransformTarget(keys[nextIdx]);
-  }
-});
 
 const SUBMIT_ENDPOINT = '';
 
