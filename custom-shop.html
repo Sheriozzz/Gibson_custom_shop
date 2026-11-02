@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gibson Custom | Made to Measure (WIP)</title>
+  <style>html,body{background:#050505}#cs-loader-boot{position:fixed;inset:0;z-index:1001;background:#050505}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/custom-shop.css" />
+</head>
+<body>
+<div id="cs-rotate" role="alert">
+  <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="20" y="8" width="24" height="44" rx="4" class="cs-rotate__phone"/><path d="M30 46h4"/>
+  </svg>
+  <p><strong>Please turn your phone sideways</strong><br>The Custom Shop is built for landscape. Rotate your phone to continue.</p>
+</div>
+<!-- black cover so the page never shows before the loading screen mounts (removed by custom-shop-loader.js) -->
+<div id="cs-loader-boot"></div>
+
+<!-- ============================================================
+     Single full-bleed canvas. Step panels overlay it on the left;
+     the guitar sits right-of-center at all times. Steps are
+     paginated (JS-controlled), not scroll-driven.
+
+     Configuration and Top Figuring steps removed per request.
+     Hardware Plating expanded into a full Hardware step covering
+     Plating + Knob Style + Vibrato.
+============================================================ -->
+<div class="cs-bg" aria-hidden="true"></div>
+<div id="cs-canvas-root" class="cs-canvas"></div>
+
+<div class="cs-orient is-hidden">
+  <button class="cs-orient__btn is-active" id="cs-orient-vertical">Vertical</button>
+  <button class="cs-orient__btn" id="cs-orient-horizontal">Horizontal</button>
+</div>
+
+<div class="cs-overlay">
+
+  <button class="cs-back" id="cs-back" hidden>&larr; Back</button>
+
+  <!-- STEP 1 — full guitar showcase, model switcher (unchanged) -->
+  <section class="cs-panel is-active" data-step="1">
+    <div class="cs-panel__eyebrow">Step 01</div>
+    <h2 class="cs-panel__title">Guitar Model</h2>
+    <p class="cs-panel__desc">Choose your model.</p>
+
+    <div class="cs-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="cs-search-input" placeholder="Search guitar models..." />
+    </div>
+
+    <div class="cs-model-switch">
+      <button class="cs-model-switch__nav" id="cs-model-prev" aria-label="Previous model">&lsaquo;</button>
+      <div class="cs-model-switch__info">
+        <div class="cs-model-switch__name" id="cs-model-name">Les Paul</div>
+        <div class="cs-model-switch__status" id="cs-model-status">Available now</div>
+      </div>
+      <button class="cs-model-switch__nav" id="cs-model-next" aria-label="Next model">&rsaquo;</button>
+    </div>
+
+    <button class="cs-select-btn" id="cs-picker-select">Select</button>
+  </section>
+
+  <!-- STEP 2 — body (wood grade) (unchanged) -->
+  <section class="cs-panel" data-step="2">
+    <div class="cs-panel__eyebrow">Step 02</div>
+    <h2 class="cs-panel__title">Body</h2>
+    <p class="cs-panel__desc">Choose the maple top grade.</p>
+    <div class="cs-options">
+      <button class="cs-option is-selected" data-group="woodGrade" data-value="plain" data-desc="Plain maple top with no figuring. Clean, uniform look and the most affordable grade.">Plain</button>
+      <button class="cs-option" data-group="woodGrade" data-value="aa" data-desc="Light flame with subtle stripes. Shows nicely under a burst without being flashy.">Figured AA</button>
+      <button class="cs-option" data-group="woodGrade" data-value="aaa" data-desc="Stronger, more even flame. The classic Les Paul look most buyers picture.">Figured AAA</button>
+      <button class="cs-option" data-group="woodGrade" data-value="5a" data-desc="Deep, wide quilted flame with a 3D shimmer. The rarest wood and the premium price.">Quilt 5A</button>
+    </div>
+<p class="cs-hover-desc">&nbsp;</p>
+    <button class="cs-select-btn" id="cs-body-continue">Continue &rarr;</button>
+  </section>
+
+  <!-- STEP 3 — neck thickness (unchanged) -->
+  <section class="cs-panel" data-step="3">
+    <div class="cs-panel__eyebrow">Step 03</div>
+    <h2 class="cs-panel__title">Neck Thickness</h2>
+    <p class="cs-panel__desc">Choose the neck profile.</p>
+    <div class="cs-options">
+      <button class="cs-option" data-group="neck" data-value="thin" data-desc="Slim taper, about 0.82 in at the 1st fret. Fast and easy, good for lead and smaller hands.">Thin</button>
+      <button class="cs-option is-selected" data-group="neck" data-value="medium" data-desc="Standard Les Paul feel, about 0.86 in at the 1st fret. The comfortable all-rounder.">Medium</button>
+      <button class="cs-option" data-group="neck" data-value="thick" data-desc="Chunky round carve, about 0.92 in at the 1st fret. A fuller grip for bigger hands.">Thick</button>
+    </div>
+<p class="cs-hover-desc">&nbsp;</p>
+  </section>
+
+  <!-- STEP 4 — finish (was step 6, unchanged content) -->
+  <section class="cs-panel" data-step="4">
+    <div class="cs-panel__eyebrow">Step 04</div>
+    <h2 class="cs-panel__title">Color Finish</h2>
+    <p class="cs-panel__desc">Choose your color.</p>
+
+    <div class="cs-options">
+      <button class="cs-option cs-option--swatch is-selected" data-group="finish" data-value="black" data-desc="Black. classic gloss black." style="--swatch:#111111"><span class="cs-swatch-dot"></span>Ebony</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="alpine-white" data-desc="Bright solid white, a modern Gibson finish." style="--swatch:#f2f2f0"><span class="cs-swatch-dot"></span>Alpine White</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="smokehouse" data-desc="Smokehouse Burst. warm brown sunburst." style="--swatch:#4a3222"><span class="cs-swatch-dot"></span>Smokehouse Burst</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="olive" data-desc="Olive Drab. matte military-inspired green." style="--swatch:#5c6b3e"><span class="cs-swatch-dot"></span>Olive Drab</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="iguana" data-desc="Iguana Burst. deep green sunburst." style="--swatch:#3d6b3a"><span class="cs-swatch-dot"></span>Iguana Burst</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="goldtop" data-desc="Goldtop. classic solid gold lacquer." style="--swatch:#d4af37"><span class="cs-swatch-dot"></span>Goldtop</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="cobalt" data-desc="Cobalt Burst. deep blue sunburst." style="--swatch:#1f4e8c"><span class="cs-swatch-dot"></span>Cobalt Burst</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="cardinal-red" data-desc="Cardinal Red. vivid solid red." style="--swatch:#a11f1f"><span class="cs-swatch-dot"></span>Cardinal Red</button>
+      <button class="cs-option cs-option--swatch" data-group="finish" data-value="bourbon" data-desc="Bourbon Burst. rich amber-brown sunburst." style="--swatch:#6b3320"><span class="cs-swatch-dot"></span>Bourbon Burst</button>
+    </div>
+
+  </section>
+
+  <!-- STEP 5 — aging level (was step 7, unchanged content) -->
+  <section class="cs-panel" data-step="5">
+    <div class="cs-panel__eyebrow">Step 05</div>
+    <h2 class="cs-panel__title">Aging Level</h2>
+    <p class="cs-panel__desc">Choose how worn it looks.</p>
+    <div class="cs-options">
+      <button class="cs-option is-selected" data-group="treatment" data-value="gloss" data-desc="High-shine, showroom-new finish and hardware.">Gloss</button>
+      <button class="cs-option" data-group="treatment" data-value="vos" data-desc="Vintage Original Spec. satin sheen, subtly aged hardware.">VOS</button>
+      <button class="cs-option" data-group="treatment" data-value="light-aged" data-desc="Murphy Lab Light Aged. subtle wear beginning at edges and contact points.">Light Aged</button>
+      <button class="cs-option" data-group="treatment" data-value="heavy-aged" data-desc="Murphy Lab Heavy Aged. worn-through finish at wear points, exposed undercoat, genuinely played-in look.">Heavy Aged</button>
+      <button class="cs-option" data-group="treatment" data-value="ultra-aged" data-desc="Murphy Lab Ultra Aged. the deepest relic work, extensive worn-through patches and checking across the whole body.">Ultra Aged</button>
+    </div>
+  </section>
+
+  <!-- STEP 6 — hardware: plating + knob style + vibrato, all new -->
+  <section class="cs-panel" data-step="6">
+    <div class="cs-panel__eyebrow">Step 06</div>
+    <h2 class="cs-panel__title">Hardware</h2>
+    <p class="cs-panel__desc">Plating, knobs and vibrato.</p>
+
+    <div class="cs-panel__eyebrow" style="margin-bottom:0;">Plating</div>
+    <div class="cs-options">
+      <button class="cs-option cs-option--swatch is-selected" data-group="hardware" data-value="gold" data-desc="Warm gold. The classic Les Paul look, and it softens with age." style="--swatch:#baa75e"><span class="cs-swatch-dot"></span>Gold</button>
+      <button class="cs-option cs-option--swatch" data-group="hardware" data-value="nickel" data-desc="Soft, slightly silvery gold. A vintage look that patinas over time." style="--swatch:#b5b19a"><span class="cs-swatch-dot"></span>Nickel</button>
+      <button class="cs-option cs-option--swatch" data-group="hardware" data-value="chrome" data-desc="Bright mirror silver. Modern and crisp, stays shiny and resists tarnish." style="--swatch:#b3b8c2"><span class="cs-swatch-dot"></span>Chrome</button>
+    </div>
+<p class="cs-hover-desc">&nbsp;</p>
+
+    <div class="cs-subopts">
+      <div class="cs-panel__eyebrow" style="margin-bottom:0;">Knob Style</div>
+      <div class="cs-options">
+        <button class="cs-option is-selected" data-group="knobStyle" data-value="gold-th" data-desc="Tall top hats with a tiered shape and a secure grip. Choose gold or silver metal below.">Top Hat</button>
+        <button class="cs-option" data-group="knobStyle" data-value="black-wh" data-desc="Black witch hats with a pointed cap and metal trim in gold or silver. The look of high-end historic reissues.">Witch Hat</button>
+        <button class="cs-option" data-group="knobStyle" data-value="speed" data-desc="Vintage reflector speed knobs with a ribbed grip. Easy to turn quickly.">Speed Knob</button>
+      </div>
+      <div class="cs-knobcolor is-open"><div class="cs-knobcolor__inner">
+        <button class="cs-knobcolor__seg is-selected" data-group="knobColor" data-value="gold" data-sw="gold">Gold</button><button class="cs-knobcolor__seg" data-group="knobColor" data-value="silver" data-sw="silver">Silver</button>
+      </div></div>
+<p class="cs-hover-desc">&nbsp;</p>
+    </div>
+
+    <div class="cs-subopts">
+      <div class="cs-panel__eyebrow" style="margin-bottom:0;">Vibrato</div>
+      <div class="cs-options">
+        <button class="cs-option is-selected" data-group="vibrato" data-value="none" data-desc="Stop-bar tailpiece. The most stable tuning and the most sustain.">None</button>
+        <button class="cs-option cs-option--swatch" data-group="vibrato" data-value="gold" data-desc="Gold Bigsby-style vibrato for gentle pitch bends and shimmer. Adds weight and slight tuning drift." style="--swatch:#c9a24b"><span class="cs-swatch-dot"></span>Gold</button>
+        <button class="cs-option cs-option--swatch" data-group="vibrato" data-value="chrome" data-desc="Chrome Bigsby-style vibrato for gentle pitch bends and shimmer. Adds weight and slight tuning drift." style="--swatch:#b3b8c2"><span class="cs-swatch-dot"></span>Chrome</button>
+      </div>
+<p class="cs-hover-desc">&nbsp;</p>
+    </div>
+
+  </section>
+
+  <!-- STEP 7 — notes (was step 9, unchanged content) -->
+  <section class="cs-panel" data-step="7">
+    <div class="cs-panel__eyebrow">Step 07</div>
+    <h2 class="cs-panel__title">Notes</h2>
+    <p class="cs-panel__desc">Anything else your luthier should know. Leave blank for none.</p>
+    <textarea class="cs-notes" placeholder="e.g. lighter weight preferred, specific fret markers, engraving requests..."></textarea>
+    <button class="cs-select-btn" id="cs-notes-continue">Continue &rarr;</button>
+  </section>
+
+  <!-- STEP 8 — summary (was step 10, unchanged content) -->
+  <section class="cs-panel" data-step="8">
+    <div class="cs-panel__eyebrow">Review</div>
+    <h2 class="cs-panel__title">Your Build</h2>
+    <dl class="cs-summary" id="cs-summary"></dl>
+    <label class="cs-ack">
+      <input type="checkbox" id="cs-ack">
+      <span class="cs-ack__box" aria-hidden="true"></span>
+      <span class="cs-ack__body"><span class="cs-ack__text">I understand this is a visual simulation. Colors, finishes, wood figuring, aging and hardware may look different in real life, and every guitar is unique. My request is not a final order or a guaranteed price or delivery date; details are confirmed with me before anything is built.</span> <button type="button" class="cs-ack__more" id="cs-ack-more">More</button></span>
+    </label>
+</section>
+
+  <!-- STEP 9 — contact details + submit -->
+  <section class="cs-panel" data-step="9">
+    <div class="cs-panel__eyebrow">Step 09</div>
+    <h2 class="cs-panel__title">Your Request</h2>
+    <p class="cs-panel__desc">Where should we send a copy of your build?</p>
+    <form class="cs-form" id="cs-contact-form" novalidate>
+      <label class="cs-field"><span>Full name</span>
+        <input type="text" name="name" autocomplete="name" placeholder="Jane Doe"><em class="cs-field__err"></em></label>
+      <label class="cs-field"><span>Email</span>
+        <input type="email" name="email" autocomplete="email" placeholder="jane@example.com"><em class="cs-field__err"></em></label>
+      <label class="cs-field"><span>Phone number</span>
+        <input type="tel" name="phone" autocomplete="tel" placeholder="+1 555 123 4567"><em class="cs-field__err"></em></label>
+      <div class="cs-form__row">
+        <label class="cs-field"><span>Country</span>
+          <input type="text" name="country" autocomplete="country-name" placeholder="Country"><em class="cs-field__err"></em></label>
+        <label class="cs-field"><span>City</span>
+          <input type="text" name="city" autocomplete="address-level2" placeholder="City"><em class="cs-field__err"></em></label>
+      </div>
+      <p class="cs-form__fail" hidden>Something went wrong. Please try again.</p>
+      <button type="submit" class="cs-select-btn cs-form__submit">Submit Request</button>
+    </form>
+    <div class="cs-thanks" id="cs-thanks" hidden>
+      <div class="cs-thanks__check">&#10003;</div>
+      <h3>Thank you, <span class="cs-thanks__name"></span>.</h3>
+      <p>Your request has been submitted. A copy of your build will arrive at <strong class="cs-thanks__email"></strong>.</p>
+    </div>
+  </section>
+
+</div>
+
+<script type="module" src="/src/custom-shop.js"></script>
+</body>
+</html>
