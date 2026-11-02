@@ -1,11 +1,6 @@
-// Gibson pick cursor. The system cursor is hidden (fine pointers only) and a
-// pick image follows the mouse, with its rounded tip exactly on the pointer.
-//   default -> /pick.png   hover (buttons etc.) -> /pick-hover.png
-//   pressed -> /pick-click.png, plus a flick on every click
-// Images are 150x150 (2x); they are shown at 75x75 with the tip at (17, 17).
-const SIZE = 75;
+const asset = (p) => import.meta.env.BASE_URL + p.replace(/^\//, '');
 const TIP = 17;
-const SRC = { idle: '/pick.png', hover: '/pick-hover.png', down: '/pick-click.png' };
+const SRC = { idle: asset('/pick.png'), hover: asset('/pick-hover.png'), down: asset('/pick-click.png') };
 
 const fine = !window.matchMedia?.('(pointer: coarse)').matches && !('ontouchstart' in window && navigator.maxTouchPoints > 0 && !window.matchMedia?.('(hover: hover)').matches);
 if (fine) {
@@ -19,7 +14,7 @@ if (fine) {
   img.src = SRC.idle;
   wrap.appendChild(img);
   document.body.appendChild(wrap);
-  Object.values(SRC).forEach((s) => { const i = new Image(); i.src = s; }); // preload
+  Object.values(SRC).forEach((s) => { const i = new Image(); i.src = s; });
 
   const INTERACTIVE = 'button, a, input, select, textarea, label, [role="button"], .cs-option, .cs-knobcolor__seg, .cs-nav__dot';
   let down = false;
@@ -50,9 +45,8 @@ if (fine) {
     if (e.pointerType === 'touch') return;
     down = false;
     setImg();
-    // select animation: a quick flick of the pick
     wrap.classList.remove('is-flick');
-    void wrap.offsetWidth; // restart the animation
+    void wrap.offsetWidth;
     wrap.classList.add('is-flick');
   }, true);
 

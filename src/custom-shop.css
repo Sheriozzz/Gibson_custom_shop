@@ -1,10 +1,3 @@
-/* ---------------------------------------------
-   CUSTOM SHOP — full-bleed single-canvas configurator.
-   Steps are pages, not scroll sections. The overlay panel
-   floats over the left side of the canvas; the guitar itself
-   stays right-of-center throughout (see camera framing in JS).
---------------------------------------------- */
-
 :root {
   --cs-bg: #0b0b0c;
   --cs-panel: rgba(20, 20, 22, 0.72);
@@ -18,7 +11,7 @@
 
 html, body {
   height: 100%;
-  overflow: hidden; /* single-screen app, no page scroll */
+  overflow: hidden;
 }
 
 body {
@@ -27,8 +20,6 @@ body {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-
-/* ---------- full-bleed canvas ---------- */
 .cs-canvas {
   position: fixed;
   inset: 0;
@@ -39,13 +30,11 @@ body {
   width: 100%;
   height: 100%;
 }
-
-/* ---------- overlay: floating panel, left side ---------- */
 .cs-overlay {
   position: fixed;
   inset: 0;
   z-index: 10;
-  pointer-events: none; /* only children with pointer-events:auto are interactive */
+  pointer-events: none;
   display: flex;
   align-items: center;
 }
@@ -88,9 +77,6 @@ body {
 }
 
 .cs-panel.is-active { display: flex; }
-
-/* legibility: subtle shadow on text so it holds up against whatever
-   part of the guitar/scene is behind the glass at any given moment */
 .cs-panel__title,
 .cs-panel__desc,
 .cs-hover-desc,
@@ -117,8 +103,6 @@ body {
   line-height: 1.6;
   color: var(--cs-mute);
 }
-
-/* ---------- search (step 1) ---------- */
 .cs-search {
   display: flex;
   align-items: center;
@@ -138,8 +122,6 @@ body {
   width: 100%;
 }
 .cs-search input::placeholder { color: var(--cs-mute); }
-
-/* ---------- model switcher (step 1) ---------- */
 .cs-model-switch {
   display: flex;
   align-items: center;
@@ -173,8 +155,6 @@ body {
   margin-top: 2px;
 }
 .cs-model-switch__status.is-unavailable { color: #b06a4a; }
-
-/* ---------- buttons shared ---------- */
 .cs-select-btn,
 .cs-submit {
   padding: 15px 28px;
@@ -193,8 +173,6 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
 }
-
-/* ---------- option pills / swatches ---------- */
 .cs-options {
   display: flex;
   flex-wrap: wrap;
@@ -234,8 +212,6 @@ body {
   color: var(--cs-mute);
   min-height: 2.6em;
 }
-
-/* ---------- notes ---------- */
 .cs-notes {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--cs-line);
@@ -248,8 +224,6 @@ body {
   resize: vertical;
 }
 .cs-notes:focus { outline: none; border-color: var(--cs-accent); }
-
-/* ---------- summary ---------- */
 .cs-summary { display: flex; flex-direction: column; gap: 12px; }
 .cs-summary div {
   display: flex;
@@ -260,17 +234,10 @@ body {
 }
 .cs-summary dt { color: var(--cs-mute); }
 .cs-summary dd { font-weight: 600; }
-
-/* ---------- responsive ---------- */
 @media (max-width: 700px) {
-  html, body { overflow: auto; } /* allow scroll on small screens instead of clipping */
+  html, body { overflow: auto; }
   .cs-panel { margin-left: 4vw; margin-right: 4vw; max-width: none; }
 }
-
-/* ============================================================
-   STEP DOT RAIL — right side, hover shows step label, click
-   jumps directly; arrows at each end step forward/back.
-============================================================ */
 
 .cs-dots {
   position: fixed;
@@ -282,27 +249,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 14px;
-}
-
-.cs-dots__arrow {
-  background: none;
-  border: 1px solid var(--cs-line);
-  color: var(--cs-mute);
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cs-dots__arrow:hover { border-color: var(--cs-accent); color: var(--cs-text); }
-
-.cs-dots__list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .cs-dot {
@@ -321,8 +267,6 @@ body {
   background: var(--cs-accent);
   transform: scale(1.7);
 }
-
-/* hover label -- small tooltip to the left of the dot */
 .cs-dot::after {
   content: attr(data-label);
   position: absolute;
@@ -345,12 +289,8 @@ body {
 .cs-dot:hover::after { opacity: 1; }
 
 @media (max-width: 700px) {
-  .cs-dots { display: none; } /* keep small screens simple -- swipe/back button still work */
+  .cs-dots { display: none; }
 }
-
-/* ============================================================
-   ORIENTATION TOGGLE — vertical/horizontal guitar view.
-============================================================ */
 .cs-orient {
   position: fixed;
   top: 32px;
@@ -379,49 +319,12 @@ body {
   color: #0b0b0c;
   font-weight: 600;
 }
-/* ============================================================
-   COLOR FAMILY sub-options + disabled option state + secondary
-   pill row (sparkle coverage). Appended for the restructured
-   Finish/Aging/Hardware system.
-============================================================ */
 
 .cs-subopts {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--cs-line);
 }
-
-.cs-options--secondary {
-  margin-top: 12px;
-}
-
-.cs-option--pill-sm {
-  padding: 7px 16px;
-  font-size: 12px;
-}
-
-.cs-option--disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cs-option__soon {
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--cs-mute);
-}
-
-/* ============================================================
-   FIGMA PASS — glossy glass UI, acoustic-tile backdrop,
-   Alumni Sans SC titles + Inter text, grey (not gold) selection,
-   bottom step nav inside each panel.
-   (Later rules override the earlier ones above.)
-============================================================ */
 
 :root {
   --cs-font-title: 'Alumni Sans SC', 'Oswald', 'Arial Narrow', sans-serif;
@@ -434,8 +337,6 @@ body {
 }
 
 body { font-family: var(--cs-font-text); background: #0a0a0a; }
-
-/* ---------- acoustic-tile backdrop (40%), clear on the left so the menu reads ---------- */
 .cs-bg {
   position: fixed;
   inset: 0;
@@ -446,20 +347,16 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.25) 28%, #000 62%);
   mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.25) 28%, #000 62%);
 }
-/* the tile layer scales with the camera zoom (--bg-scale set from JS) so it
-   zooms as one scene with the guitar; the fade-out mask stays put on the parent */
 .cs-bg::before {
   content: '';
   position: absolute;
-  inset: -100%; /* 3x the screen so the layer can pull back without edges */
-  background: url('/acoustic-tiles-seamless.jpg') center / 22.2vw auto repeat; /* seamless tile: 20 pyramids across */
+  inset: -100%;
+  background: url('/acoustic-tiles-seamless.jpg') center / 22.2vw auto repeat;
   opacity: 0.4;
   transform: scale(var(--bg-scale, 1.4));
   transform-origin: calc(var(--bg-ox, 68vw) + 100vw) 150vh;
   will-change: transform;
 }
-
-/* ---------- panel ---------- */
 .cs-panel {
   width: clamp(380px, 27vw, 540px);
   max-width: none;
@@ -479,8 +376,6 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
     inset 0 -1px 0 rgba(255, 255, 255, 0.05);
 }
 .cs-panel:not([data-step="1"]) { min-height: clamp(520px, 64vh, 680px); }
-
-/* the "Step 0X" line is replaced by the bottom nav */
 .cs-panel > .cs-panel__eyebrow:first-child { display: none; }
 
 .cs-panel__title {
@@ -498,11 +393,8 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
   line-height: 1.45;
   color: #8e8e8e;
 }
-/* section labels inside a panel (Hardware: Plating / Knob Style / Vibrato) */
 .cs-panel__eyebrow { color: #8e8e8e; letter-spacing: 0.16em; font-size: 11px; }
 .cs-subopts { border-top-color: rgba(255, 255, 255, 0.08); }
-
-/* ---------- option pills & swatches: glossy glass, grey selection ---------- */
 .cs-option {
   font-family: var(--cs-font-text);
   font-weight: 400;
@@ -524,8 +416,6 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
   box-shadow: 0 0 0 1px #fff, inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 3px 12px rgba(0, 0, 0, 0.4);
 }
 .cs-swatch-dot { width: 1.05em; height: 1.05em; border-color: rgba(255, 255, 255, 0.2); }
-
-/* ---------- primary buttons (Select / Submit): glossy grey ---------- */
 .cs-select-btn,
 .cs-submit {
   align-self: center;
@@ -544,11 +434,8 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
   background: linear-gradient(180deg, #555, #303030);
   border-color: rgba(255, 255, 255, 0.5);
 }
-/* Continue buttons are replaced by the bottom nav */
 #cs-body-continue, #cs-notes-continue { display: none; }
-
-/* ---------- step 1: guitar model picker ---------- */
-.cs-search { display: none; }  /* removed in the new design */
+.cs-search { display: none; }
 .cs-model-switch {
   border: none;
   padding: 10px 0 6px;
@@ -581,12 +468,8 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
 }
 .cs-model-switch__status.is-unavailable { color: #8a6a4a; }
 .cs-panel[data-step="1"] .cs-select-btn { margin-top: clamp(8px, 1.2vw, 22px); }
-
-/* ---------- notes / summary keep the new type ---------- */
 .cs-notes { font-family: var(--cs-font-text); }
 .cs-summary dt { color: #8e8e8e; }
-
-/* ---------- bottom step nav (inside each panel, steps 2-8) ---------- */
 .cs-nav {
   margin-top: auto;
   padding-top: clamp(18px, 2vw, 34px);
@@ -633,13 +516,8 @@ body { font-family: var(--cs-font-text); background: #0a0a0a; }
   box-shadow: inset 0 1px 0 #fff, 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 .cs-nav__count { font-size: 14px; color: #777; font-variant-numeric: tabular-nums; }
-
-/* the old top/back controls give way to the bottom nav; the right-hand dot
-   rail only exists on step 1 (before a guitar is picked) */
 .cs-back { display: none !important; }
 body:not([data-step="1"]) .cs-dots { display: none; }
-
-/* ---------- orientation toggle ---------- */
 .cs-orient {
   background: rgba(255, 255, 255, 0.05);
   border: none;
@@ -658,8 +536,6 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 @media (max-width: 700px) {
   .cs-panel { width: auto; margin-left: 4vw; margin-right: 4vw; }
 }
-
-/* step 1 "Select" button — exact Figma spec */
 .cs-panel[data-step="1"] .cs-select-btn {
   width: 258px;
   height: 55px;
@@ -672,16 +548,7 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-panel[data-step="1"] .cs-select-btn:hover:not(:disabled) {
   background: rgba(109, 109, 109, 0.32);
 }
-
-/* ============================================================
-   FIGMA PASS 2 — tighter menus, no side rail, glossy-outline
-   button, smaller model name, compact Hardware panel.
-============================================================ */
-
-/* the right-hand dot rail is gone for good */
 .cs-dots { display: none !important; }
-
-/* no empty vertical space: panels hug their content */
 .cs-panel:not([data-step="1"]) { min-height: 0; }
 .cs-hover-desc { display: block; font-size: 12.5px; line-height: 1.45; min-height: 2.9em; margin: 0; }
 .cs-panel[data-step="6"] .cs-hover-desc { font-size: 11.5px; min-height: 2.9em; }
@@ -697,16 +564,12 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-options { gap: clamp(7px, 0.6vw, 10px); }
 .cs-option { font-size: clamp(12px, 0.85vw, 15px); padding: 0.65em 1.25em; }
 .cs-nav { margin-top: 0; padding-top: clamp(14px, 1.4vw, 24px); }
-
-/* step 1: smaller model name + status, greyed out when unavailable */
 .cs-model-switch__name { font-size: clamp(19px, 1.3vw, 25px); }
 .cs-model-switch__status { font-size: clamp(11px, 0.78vw, 14px); margin-top: 2px; }
 .cs-model-switch__name.is-unavailable,
 .cs-model-switch__status { color: #6b6b6b; }
 .cs-model-switch { padding: 4px 0 0; }
 .cs-select-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-/* glossy-outline button: no flat stroke, a light-catching gradient edge instead */
 .cs-select-btn,
 .cs-submit {
   position: relative;
@@ -726,8 +589,6 @@ body:not([data-step="1"]) .cs-dots { display: none; }
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   pointer-events: none;
 }
-
-/* Hardware: three compact rows so the whole panel fits on screen */
 .cs-panel[data-step="6"] { width: clamp(400px, 29vw, 560px); gap: 10px; }
 .cs-panel[data-step="6"] .cs-panel__desc { font-size: clamp(13px, 0.9vw, 16px); }
 .cs-panel[data-step="6"] .cs-options { gap: 7px; flex-wrap: wrap; }
@@ -735,8 +596,6 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-panel[data-step="6"] .cs-subopts { margin-top: 4px; padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .cs-panel[data-step="6"] .cs-panel__eyebrow { margin: 0 !important; font-size: 10px; }
 .cs-panel[data-step="6"] .cs-nav { padding-top: 8px; gap: 6px; }
-
-/* ---------- smaller bottom nav ---------- */
 .cs-nav { gap: 6px; padding-top: clamp(10px, 1vw, 16px); }
 .cs-nav__row { gap: clamp(10px, 0.9vw, 16px); }
 .cs-nav__arrow { width: clamp(28px, 1.9vw, 34px); height: clamp(28px, 1.9vw, 34px); font-size: 14px; }
@@ -744,19 +603,12 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-nav__dot { width: 8px; height: 8px; }
 .cs-nav__dot.is-active { width: 18px; height: 18px; }
 .cs-nav__count { font-size: 12px; }
-
-/* status text: same grey whether available or not */
 .cs-model-switch__status, .cs-model-switch__status.is-unavailable { color: #6b6b6b; }
-
-/* Hardware: descriptions stay collapsed and open only while hovering their own section */
 .cs-panel[data-step="6"] .cs-hover-desc {
   min-height: 0; max-height: 0; opacity: 0; overflow: hidden; margin: 0;
   transition: max-height 0.9s ease, opacity 1s ease;
 }
 .cs-panel[data-step="6"] .cs-hover-desc.is-open { max-height: 3.4em; opacity: 1; }
-
-/* knob metal choice: a Gold | Silver tab hanging off the selected knob button
-   (JS sets its left/width to match the button) */
 .cs-panel[data-step="6"] .cs-subopts .cs-options .cs-option { position: relative; z-index: 2; }
 .cs-knobcolor {
   display: grid; grid-template-rows: 0fr; opacity: 0;
@@ -767,9 +619,9 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-knobcolor__inner { overflow: hidden; min-height: 0; display: flex; border-radius: 0 0 18px 18px; }
 .cs-knobcolor__seg {
   flex: 1; cursor: pointer; font: inherit; font-size: 11.5px; white-space: nowrap;
-  padding: 17px 2px 3px; /* top padding tucks under the button */
+  padding: 17px 2px 3px;
   color: #cfd0d4; background: rgba(120, 120, 128, 0.85);
-  border: 1.5px solid transparent; border-top: 0; /* outline shows only on the selected colour */
+  border: 1.5px solid transparent; border-top: 0;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .cs-knobcolor__seg:first-child { border-radius: 0 0 0 18px; }
@@ -777,11 +629,7 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-knobcolor__seg[data-sw="gold"].is-selected { background: #b8a45a; color: #fff; }
 .cs-knobcolor__seg[data-sw="silver"].is-selected { background: #c9ccd3; color: #2a2a2e; }
 .cs-knobcolor__seg.is-selected { border-color: #fff; }
-
-/* the selected knob button is opaque so the tab reads as hanging off it */
 .cs-panel[data-step="6"] [data-group="knobStyle"].is-selected { background: #424244; }
-
-/* ---------- Gibson pick cursor ---------- */
 html.has-pick, html.has-pick * { cursor: none !important; }
 #cs-pick {
   position: fixed; left: 0; top: 0; width: 75px; height: 75px;
@@ -792,7 +640,7 @@ html.has-pick, html.has-pick * { cursor: none !important; }
 #cs-pick.is-visible { opacity: 1; }
 #cs-pick img {
   width: 100%; height: 100%; display: block;
-  transform-origin: 17px 17px; /* rotate / scale around the tip */
+  transform-origin: 17px 17px;
   transition: transform 0.18s ease;
 }
 #cs-pick[data-state="hover"] img { transform: scale(1.0); }
@@ -804,23 +652,9 @@ html.has-pick, html.has-pick * { cursor: none !important; }
   70%  { transform: rotate(8deg) scale(1.02); }
   100% { transform: rotate(0) scale(1); }
 }
-.cs-pick-ripple-unused {
-  position: fixed; z-index: 1999; width: 14px; height: 14px; margin: -7px 0 0 -7px;
-  border-radius: 50%; pointer-events: none;
-  border: 2px solid #c9a24b; box-shadow: 0 0 12px rgba(201, 162, 75, 0.7);
-  animation: cs-pick-ripple 0.6s ease-out forwards;
-}
-@keyframes cs-pick-ripple {
-  from { transform: scale(0.4); opacity: 0.95; }
-  to   { transform: scale(4.2); opacity: 0; }
-}
-
-/* summary rows: a long value (e.g. Notes) wraps in its own column, never touching the label */
 .cs-summary div { gap: 24px; align-items: flex-start; }
 .cs-summary dt { flex: 0 0 auto; }
 .cs-summary dd { min-width: 0; max-width: 65%; text-align: right; overflow-wrap: anywhere; line-height: 1.45; }
-
-/* ---------- navigation hints (bottom-right) ---------- */
 .cs-hints {
   position: fixed; right: clamp(16px, 2vw, 36px); bottom: clamp(16px, 2.2vw, 36px);
   z-index: 60; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
@@ -836,14 +670,8 @@ html.has-pick, html.has-pick * { cursor: none !important; }
 }
 .cs-hint__label b { color: #fff; font-weight: 600; margin-right: 6px; }
 .cs-hint__label i { font-style: normal; opacity: 0.45; margin: 0 6px; }
-.cs-hint:hover .cs-hint__label,
-.cs-hints.is-intro .cs-hint__label { opacity: 1; transform: none; }
-.cs-hints.is-intro .cs-hint:nth-child(2) .cs-hint__label { transition-delay: 0.15s; }
-.cs-hints.is-intro .cs-hint:nth-child(3) .cs-hint__label { transition-delay: 0.3s; }
-.cs-hints.is-intro .cs-hint:nth-child(4) .cs-hint__label { transition-delay: 0.45s; }
-body[data-step="1"] .cs-hint--slide { display: none; } /* nothing to slide on the stand */
-
-/* glass pill holding "mouse | trackpad" */
+.cs-hint:hover .cs-hint__label { opacity: 1; transform: none; }
+body[data-step="1"] .cs-hint--slide { display: none; }
 .cs-hint__icon {
   height: 46px; padding: 0 14px; border-radius: 999px; flex: none;
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -862,8 +690,6 @@ body[data-step="1"] .cs-hint--slide { display: none; } /* nothing to slide on th
 .cs-hint svg .m-wheel.on { fill: #c9a24b; stroke: #c9a24b; }
 .cs-hint svg .p-dot { fill: #c9a24b; }
 .cs-hint svg .arr { fill: none; stroke: #c9a24b; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
-
-/* looping demos */
 @keyframes hint-drag  { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
 @keyframes hint-wheel { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
 @keyframes hint-pan   { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
@@ -887,8 +713,6 @@ body[data-step="1"] .cs-hint--slide { display: none; } /* nothing to slide on th
 .d-pinch-b { animation: pad-in-b 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .cs-hint svg *, .d-drag, .d-slide, .d-pan, .d-pinch-a, .d-pinch-b { animation: none !important; } .cs-hint svg .arr { opacity: 0.8; } }
 @media (max-width: 700px) { .cs-hints { transform: scale(0.85); transform-origin: bottom right; } }
-
-/* ---------- step 9: contact form (dark) ---------- */
 .cs-form { display: flex; flex-direction: column; gap: 12px; }
 .cs-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .cs-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -908,7 +732,6 @@ body[data-step="1"] .cs-hint--slide { display: none; } /* nothing to slide on th
 .cs-field.has-error input { border-color: #c4584c; }
 .cs-field__err { font-style: normal; font-size: 11.5px; color: #e0796d; min-height: 0; }
 .cs-field__err:empty { display: none; }
-/* browser autofill keeps the dark look */
 .cs-field input:-webkit-autofill,
 .cs-field input:-webkit-autofill:focus {
   -webkit-text-fill-color: #f2f2f2;
@@ -932,8 +755,6 @@ body[data-step="1"] .cs-hint--slide { display: none; } /* nothing to slide on th
   animation: cs-thanks-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 @keyframes cs-thanks-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-/* hints: full on step 1, one information icon afterwards (hover opens them, they fold 3s after leaving) */
 .cs-hints__info {
   display: none; width: 46px; height: 46px; border-radius: 50%; padding: 0; cursor: pointer;
   align-items: center; justify-content: center;
@@ -948,15 +769,11 @@ body[data-step]:not([data-step="1"]) .cs-hints.is-open .cs-hint { animation: hin
 body[data-step]:not([data-step="1"]) .cs-hints.is-open .cs-hint__label { opacity: 1; transform: none; }
 body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opacity: 1; transform: none; }
 @keyframes hint-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-/* Gold / Silver tab: tighter corners; no extra gap above it when it is hidden (Speed Knob) */
 .cs-knobcolor__inner { border-radius: 0 0 10px 10px; }
 .cs-knobcolor__seg:first-child { border-radius: 0 0 0 10px; }
 .cs-knobcolor__seg:last-child { border-radius: 0 0 10px 0; }
 .cs-knobcolor:not(.is-open) { margin-top: 0; }
 .cs-knobcolor { transition: grid-template-rows 0.45s ease, opacity 0.4s ease, margin-top 0.45s ease, margin-left 0.3s ease, width 0.3s ease; }
-
-/* ---------- Your Build: simulation acknowledgement ---------- */
 .cs-ack { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; margin-top: 4px; padding: 12px 14px; border-radius: 14px;
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); }
 .cs-ack input { position: absolute; opacity: 0; pointer-events: none; }
@@ -970,19 +787,13 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
 .cs-ack__text { font-size: 12px; line-height: 1.5; color: #b9b9b9; }
 .cs-ack.is-nudge { animation: cs-nudge 0.45s ease; border-color: rgba(224,121,109,0.8); }
 @keyframes cs-nudge { 0%,100% { transform: none; } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-
-/* the last screen has no way back to the menu */
-.cs-panel[data-step="9"].is-sent .cs-nav { display: none; } /* only the thank-you screen is final */
+.cs-panel[data-step="9"].is-sent .cs-nav { display: none; }
 .cs-orient.is-hidden { display: none !important; }
 
 .cs-ack__body { display: block; }
 .cs-ack__text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cs-ack__text.is-open { display: block; overflow: visible; }
 .cs-ack__more { background: none; border: none; padding: 2px 0 0; margin: 0; font: inherit; font-size: 12px; color: #fff; text-decoration: underline; cursor: pointer; }
-
-/* ============================================================
-   MOBILE ONLY (phones). Desktop rules above are untouched.
-============================================================ */
 #cs-rotate { display: none; }
 @media (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
   #cs-rotate {
@@ -995,8 +806,6 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-rotate__phone { transform-origin: 32px 30px; animation: cs-rotate-turn 2.4s ease-in-out infinite; }
   @keyframes cs-rotate-turn { 0%, 15% { transform: rotate(0); } 55%, 100% { transform: rotate(90deg); } }
 }
-
-/* phones held sideways */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   .cs-panel, .cs-panel:not([data-step="1"]) {
     width: clamp(210px, 31vw, 270px);
@@ -1009,7 +818,7 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
     max-height: calc(100vh - 16px);
   }
   .cs-panel__title { font-size: 22px; }
-  .cs-panel__desc, .cs-panel__sub { font-size: 11px; line-height: 1.35; }
+  .cs-panel__desc { font-size: 11px; line-height: 1.35; }
   .cs-options { gap: 5px; }
   .cs-option { font-size: 11px; padding: 0.5em 0.9em; }
   .cs-model-switch__name { font-size: 16px; }
@@ -1017,15 +826,13 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-select-btn, .cs-submit { font-size: 13px; padding: 0.6em 1em; }
   .cs-nav { padding-top: 8px; gap: 4px; }
   .cs-nav__arrow { width: 28px; height: 28px; }
-  .cs-form input, .cs-form select { font-size: 16px; padding: 8px 10px; } /* 16px stops iOS zooming into fields */
+  .cs-form input, .cs-form select { font-size: 16px; padding: 8px 10px; }
   .cs-ack { padding: 8px 10px; gap: 8px; }
   .cs-ack__text, .cs-ack__more { font-size: 10.5px; }
   .cs-orient { top: 10px; right: 12px; padding: 3px; }
   .cs-orient__btn { font-size: 11px; padding: 0.5em 1em; }
   .cs-hints { transform: scale(0.7); transform-origin: bottom right; right: 8px; bottom: 8px; }
 }
-
-/* ---- phones held sideways, round 2: touch sizing, scroll cue, step 1 ---- */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   .cs-panel, .cs-panel:not([data-step="1"]) {
     margin-left: max(22px, calc(env(safe-area-inset-left) + 12px));
@@ -1033,7 +840,6 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
     max-height: calc(100dvh - 44px);
     padding-right: 18px;
   }
-  /* comfortable touch targets (the usual guidance is 44px; 40px is the most that fits a sideways phone) with 8px between them */
   .cs-options { gap: 8px; }
   .cs-option { min-height: 40px; padding: 0.55em 1.1em; font-size: 12px; display: inline-flex; align-items: center; }
   .cs-nav { padding-top: 12px; gap: 6px; }
@@ -1041,11 +847,9 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-nav__row { gap: 6px; }
   .cs-nav__dots { gap: 2px; }
   .cs-nav__dot { position: relative; }
-  .cs-nav__dot::after { content: ''; position: absolute; inset: -9px; } /* bigger tap area around the small dots */
+  .cs-nav__dot::after { content: ''; position: absolute; inset: -9px; }
   .cs-orient__btn { min-height: 36px; }
   .cs-knobcolor__seg { min-height: 34px; }
-
-  /* step 1 */
   .cs-panel[data-step="1"] .cs-select-btn { width: 100%; max-width: 160px; height: 40px; font-size: 13px; margin: 6px auto 0; align-self: center; }
   .cs-model-switch { gap: 8px; justify-content: center; }
   .cs-model-switch__nav { width: 40px; height: 40px; flex: none; }
@@ -1054,16 +858,12 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-submit { min-height: 40px; }
   .cs-ack__more { padding: 8px 4px; }
 }
-
-/* scroll cue (a thumb drawn by script, since phone browsers hide scrollbars) */
 #cs-sbar { display: none; }
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   #cs-sbar { display: block; position: fixed; z-index: 30; width: 4px; border-radius: 4px; background: rgba(255,255,255,0.12); pointer-events: none; opacity: 0; transition: opacity 0.25s; }
   #cs-sbar.is-on { opacity: 1; }
   #cs-sbar i { display: block; width: 100%; border-radius: 4px; background: rgba(255,255,255,0.6); position: relative; }
 }
-
-/* ---- phones held sideways, round 3 ---- */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   .cs-panel[data-step="1"] .cs-select-btn { margin-top: 22px; }
   .cs-panel[data-step="1"] .cs-model-switch { padding-top: 14px; }
@@ -1074,8 +874,6 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-panel[data-step="6"] .cs-subopts { gap: 10px; padding-top: 14px; margin-top: 6px; }
   .cs-panel[data-step="6"] .cs-options { gap: 8px; }
   .cs-panel[data-step="6"] .cs-option { min-height: 40px; }
-
-  /* Gold | Silver attached under the selected knob button */
   .cs-knobcolor.is-phone {
     position: absolute; display: block; margin: 0; height: 36px; z-index: 3;
     grid-template-rows: none; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
@@ -1088,22 +886,14 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-panel[data-step="6"] [data-group="knobStyle"].has-tab { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
 }
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
-  .cs-panel[data-step="6"] .cs-options { align-items: flex-start; } /* the knob button that grows must not stretch its neighbours */
+  .cs-panel[data-step="6"] .cs-options { align-items: flex-start; }
 }
-
-/* scrolling the menu never chains into the page / model (desktop and phones) */
 .cs-panel { overscroll-behavior: contain; }
-
-/* ---- phones held sideways, round 4 ---- */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
-  /* the same 22px breathing room on the left (menu) and the right (toggle, hints) */
   .cs-orient { top: 22px; right: max(22px, calc(env(safe-area-inset-right) + 12px)); }
   .cs-hints { right: max(22px, calc(env(safe-area-inset-right) + 12px)); bottom: 22px; }
-  /* Finish: one colour per line */
   .cs-option--swatch[data-group="finish"] { width: 100%; justify-content: flex-start; }
 }
-
-/* round 5: the knob button stays a full pill; Gold | Silver tuck in underneath it */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   .cs-panel[data-step="6"] [data-group="knobStyle"].has-tab { border-radius: 999px; border-bottom-color: inherit; }
   .cs-knobcolor.is-phone { height: 44px; z-index: 1; }

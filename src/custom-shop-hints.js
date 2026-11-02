@@ -1,7 +1,3 @@
-// Navigation hints, bottom-right corner. Each hint shows the mouse gesture and
-// the trackpad equivalent side by side ("mouse | trackpad") as small looping
-// animations. Labels slide out for a few seconds after the loading screen,
-// then tuck away; hovering a hint shows its label again.
 const touch = window.matchMedia?.('(pointer: coarse)').matches;
 
 const MOUSE = (lit) => `
@@ -68,9 +64,6 @@ box.innerHTML = ITEMS.map((it) => {
 }).join('');
 document.body.appendChild(box);
 
-// Step 1 (picking a guitar) shows the full hints. From step 2 on they fold into one
-// information icon; hovering it opens them again, and they fold away 3 seconds after
-// the mouse leaves.
 const info = document.createElement('button');
 info.type = 'button';
 info.className = 'cs-hints__info';

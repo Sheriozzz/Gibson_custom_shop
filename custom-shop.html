@@ -17,18 +17,8 @@
   </svg>
   <p><strong>Please turn your phone sideways</strong><br>The Custom Shop is built for landscape. Rotate your phone to continue.</p>
 </div>
-<!-- black cover so the page never shows before the loading screen mounts (removed by custom-shop-loader.js) -->
 <div id="cs-loader-boot"></div>
 
-<!-- ============================================================
-     Single full-bleed canvas. Step panels overlay it on the left;
-     the guitar sits right-of-center at all times. Steps are
-     paginated (JS-controlled), not scroll-driven.
-
-     Configuration and Top Figuring steps removed per request.
-     Hardware Plating expanded into a full Hardware step covering
-     Plating + Knob Style + Vibrato.
-============================================================ -->
 <div class="cs-bg" aria-hidden="true"></div>
 <div id="cs-canvas-root" class="cs-canvas"></div>
 
@@ -41,7 +31,6 @@
 
   <button class="cs-back" id="cs-back" hidden>&larr; Back</button>
 
-  <!-- STEP 1 — full guitar showcase, model switcher (unchanged) -->
   <section class="cs-panel is-active" data-step="1">
     <div class="cs-panel__eyebrow">Step 01</div>
     <h2 class="cs-panel__title">Guitar Model</h2>
@@ -64,7 +53,6 @@
     <button class="cs-select-btn" id="cs-picker-select">Select</button>
   </section>
 
-  <!-- STEP 2 — body (wood grade) (unchanged) -->
   <section class="cs-panel" data-step="2">
     <div class="cs-panel__eyebrow">Step 02</div>
     <h2 class="cs-panel__title">Body</h2>
@@ -79,7 +67,6 @@
     <button class="cs-select-btn" id="cs-body-continue">Continue &rarr;</button>
   </section>
 
-  <!-- STEP 3 — neck thickness (unchanged) -->
   <section class="cs-panel" data-step="3">
     <div class="cs-panel__eyebrow">Step 03</div>
     <h2 class="cs-panel__title">Neck Thickness</h2>
@@ -92,7 +79,6 @@
 <p class="cs-hover-desc">&nbsp;</p>
   </section>
 
-  <!-- STEP 4 — finish (was step 6, unchanged content) -->
   <section class="cs-panel" data-step="4">
     <div class="cs-panel__eyebrow">Step 04</div>
     <h2 class="cs-panel__title">Color Finish</h2>
@@ -112,7 +98,6 @@
 
   </section>
 
-  <!-- STEP 5 — aging level (was step 7, unchanged content) -->
   <section class="cs-panel" data-step="5">
     <div class="cs-panel__eyebrow">Step 05</div>
     <h2 class="cs-panel__title">Aging Level</h2>
@@ -126,7 +111,6 @@
     </div>
   </section>
 
-  <!-- STEP 6 — hardware: plating + knob style + vibrato, all new -->
   <section class="cs-panel" data-step="6">
     <div class="cs-panel__eyebrow">Step 06</div>
     <h2 class="cs-panel__title">Hardware</h2>
@@ -165,7 +149,6 @@
 
   </section>
 
-  <!-- STEP 7 — notes (was step 9, unchanged content) -->
   <section class="cs-panel" data-step="7">
     <div class="cs-panel__eyebrow">Step 07</div>
     <h2 class="cs-panel__title">Notes</h2>
@@ -174,7 +157,6 @@
     <button class="cs-select-btn" id="cs-notes-continue">Continue &rarr;</button>
   </section>
 
-  <!-- STEP 8 — summary (was step 10, unchanged content) -->
   <section class="cs-panel" data-step="8">
     <div class="cs-panel__eyebrow">Review</div>
     <h2 class="cs-panel__title">Your Build</h2>
@@ -186,7 +168,6 @@
     </label>
 </section>
 
-  <!-- STEP 9 — contact details + submit -->
   <section class="cs-panel" data-step="9">
     <div class="cs-panel__eyebrow">Step 09</div>
     <h2 class="cs-panel__title">Your Request</h2>

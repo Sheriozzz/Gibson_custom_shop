@@ -1,41 +1,22 @@
-// Loading screen: the Gibson Custom sign warms up like real neon.
-//
-//   1. the white neon tubes flicker on first, dim, with a soft bloom
-//   2. as they brighten, their light SPILLS outward onto the orange panel and
-//      the brushed-metal frame -- close to the letters first, edges last
-//   3. at full brightness the sign holds for a moment, then fades out
-//
-// Rendered in WebGL so every blend is per-pixel and smooth (no stepping or
-// blocky edges). If WebGL is unavailable it falls back to a plain crossfade.
-//
-// Needs two same-size images in /public (change the paths below):
-//   sign-dark.jpg  -- the sign mostly in shadow
-//   sign-lit.jpg   -- the sign fully lit (your original photo)
-// The neon letters are found automatically from the lit image (the near-white
-// pixels), so no separate mask file is needed.
-//
-// Import this FIRST in custom-shop.js so it sees every model that loads.
 import * as THREE from 'three';
+const asset = (p) => import.meta.env.BASE_URL + p.replace(/^\//, '');
 
-const DARK_SRC = '/sign-dark.jpg';
-const LIT_SRC = '/sign-lit.jpg';
+const DARK_SRC = asset('/sign-dark.jpg');
+const LIT_SRC = asset('/sign-lit.jpg');
 
-// zoom on the sign. 1 = image fits the screen width; raise it if your photo has
-// empty margin around the sign (1.1 = 10% bigger, edges beyond the screen are cropped)
 const SIGN_SCALE = 1.12;
 
-const MIN_DURATION = 5.0; // seconds -- the warm-up never plays faster than this
-const HOLD = 0.5;         // seconds at full brightness before fading out
+const MIN_DURATION = 5.0;
+const HOLD = 0.5;
 const FADE_OUT = 0.9;
-const MAX_WAIT = 25;      // safety: never block the page longer than this
-const LETTER_STEP = 0.4;  // brightness at which the letters are fully on; the spill onto the panel overlaps with it
-const MAX_LIT = 0.8;      // the sign only warms up to 80% lit; the progress bar still fills to 100%
-const BLOOM = 0.35;       // soft glow around the letters (0 = none)
-const MASK_MAX_W = 2000;  // resolution the letters are detected at
+const MAX_WAIT = 25;
+const LETTER_STEP = 0.4;
+const MAX_LIT = 0.8;
+const BLOOM = 0.35;
+const MASK_MAX_W = 2000;
 
 const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-// ---------- DOM ----------
 const style = document.createElement('style');
 style.textContent = `
 #cs-loader{position:fixed;inset:0;z-index:1000;background:#050505;display:flex;align-items:center;justify-content:center;transition:opacity ${FADE_OUT}s ease;overflow:hidden;}
@@ -60,14 +41,13 @@ function mount() {
     <div class="cs-bar"><i></i></div>
   `;
   document.body.appendChild(root);
-  document.getElementById('cs-loader-boot')?.remove(); // the static black cover from the HTML, now replaced by this overlay
+  document.getElementById('cs-loader-boot')?.remove();
   signBox = root.querySelector('.cs-sign');
   glCv = root.querySelector('.cs-sign__gl');
   barFill = root.querySelector('.cs-bar i');
 }
 mount();
 
-// ---------- real loading progress ----------
 let loadProgress = 0;
 let sawItems = false;
 let loadDone = false;
@@ -87,13 +67,11 @@ manager.onProgress = (url, loaded, total) => {
   prevProgress?.(url, loaded, total);
 };
 manager.onLoad = (...a) => {
-  // the queue can briefly empty between batches -- wait a beat for new work
   clearTimeout(doneTimer);
   doneTimer = setTimeout(() => { loadDone = true; loadProgress = 1; }, 350);
   prevLoad?.(...a);
 };
 
-// ---------- helpers ----------
 function clamp01(v) { return Math.min(1, Math.max(0, v)); }
 function smooth(a, b, v) { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); }
 
@@ -106,13 +84,11 @@ function loadImage(src) {
   });
 }
 
-// separable box blur (3 passes ~ gaussian) on a Float32 field
 function blurField(src, w, h, r) {
   let a = Float32Array.from(src);
   let b = new Float32Array(a.length);
   const size = r * 2 + 1;
   for (let pass = 0; pass < 3; pass++) {
-    // horizontal
     for (let y = 0; y < h; y++) {
       const row = y * w;
       let sum = 0;
@@ -122,7 +98,6 @@ function blurField(src, w, h, r) {
         sum += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)];
       }
     }
-    // vertical
     for (let x = 0; x < w; x++) {
       let sum = 0;
       for (let y = -r; y <= r; y++) sum += b[Math.min(h - 1, Math.max(0, y)) * w + x];
@@ -135,9 +110,6 @@ function blurField(src, w, h, r) {
   return a;
 }
 
-// Finds the neon letters in the LIT image: bright, unsaturated pixels, then
-// drops thin bright specks (metal edge highlights, rivets) by requiring the
-// surroundings to be mostly white too. Edges stay crisp and anti-aliased.
 function buildLetterMask(litImg) {
   const scale = Math.min(1, MASK_MAX_W / litImg.naturalWidth);
   const w = Math.round(litImg.naturalWidth * scale);
@@ -160,7 +132,6 @@ function buildLetterMask(litImg) {
   const mask = new Float32Array(w * h);
   for (let p = 0; p < mask.length; p++) mask[p] = white[p] * smooth(0.2, 0.42, density[p]);
 
-  // full-res mask texture data (R channel)
   const maskBytes = new Uint8Array(w * h * 4);
   for (let p = 0; p < mask.length; p++) {
     const v = Math.round(mask[p] * 255);
@@ -168,7 +139,6 @@ function buildLetterMask(litImg) {
     maskBytes[p * 4 + 3] = 255;
   }
 
-  // low-res light-spill fields, from the mask: R = tight halo, G = wide spill
   const fw = Math.max(64, Math.round(w / 4));
   const fh = Math.max(32, Math.round(h / 4));
   const small = new Float32Array(fw * fh);
@@ -197,7 +167,6 @@ function buildLetterMask(litImg) {
   return { w, h, maskBytes, fw, fh, fieldBytes };
 }
 
-// ---------- WebGL renderer ----------
 const VERT = `
 attribute vec2 a;
 varying vec2 v;
@@ -283,7 +252,6 @@ function createRenderer(images, data) {
   const uBloom = gl.getUniformLocation(prog, 'uBloom');
   gl.uniform1f(uBloom, BLOOM);
 
-  // canvas resolution follows the screen (capped by the photo's own detail)
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cssW = signBox.clientWidth * SIGN_SCALE;
@@ -307,7 +275,6 @@ function createRenderer(images, data) {
   };
 }
 
-// no-WebGL fallback: dark photo with the lit photo faded in over it
 function createFallback(images) {
   const dark = images.dark;
   const lit = images.lit;
@@ -322,16 +289,14 @@ function createFallback(images) {
   };
 }
 
-// ---------- animation ----------
 let renderer = null;
 let start = 0;
-let b = 0;           // displayed brightness 0..1
+let b = 0;
 let doneAt = 0;
 let finished = false;
 let minDuration = MIN_DURATION;
-let cache = null; // decoded sign images + letter mask, reused by replays
+let cache = null;
 
-// quick neon-tube flicker during the first moments of the warm-up
 const flickerTimes = [0.25, 0.4, 0.55, 0.8, 0.95];
 function flicker(t) {
   if (reduceMotion || t > 1.3) return 1;
@@ -346,9 +311,8 @@ function frame(now) {
   const t = (now - start) / 1000;
 
   const timeline = clamp01(t / minDuration);
-  // never ahead of the real load, never behind the minimum timeline
   const target = Math.min(timeline, sawItems || t > MAX_WAIT ? Math.max(loadProgress, loadDone ? 1 : 0) : 0.35);
-  b += (target - b) * 0.08; // ease toward the target
+  b += (target - b) * 0.08;
   if (target >= 1 && b > 0.995) b = 1;
 
   const letters = (0.1 + 0.9 * smooth(0, LETTER_STEP, b)) * flicker(t) * MAX_LIT;
@@ -370,7 +334,6 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-// if the sign images are missing, skip the loader instead of blocking the app
 function abort() { root.remove(); window.__csLoaderDone = true; window.dispatchEvent(new Event('cs-loader-done')); }
 
 function begin(images, data) {
@@ -384,7 +347,6 @@ function begin(images, data) {
   requestAnimationFrame(frame);
 }
 
-// the first run happens on every page load and every manual refresh
 Promise.all([loadImage(DARK_SRC), loadImage(LIT_SRC)])
   .then(([dark, lit]) => {
     cache = { dark, lit, data: buildLetterMask(lit) };
@@ -395,9 +357,8 @@ Promise.all([loadImage(DARK_SRC), loadImage(LIT_SRC)])
     abort();
   });
 
-// plays the sign again (used each time the guitar-picking scene reloads)
 window.csReplayLoader = () => {
-  if (!cache || (root && root.isConnected)) return; // not ready yet, or already showing
+  if (!cache || (root && root.isConnected)) return;
   window.__csLoaderDone = false;
   loadProgress = 0; sawItems = false; loadDone = false; clearTimeout(doneTimer);
   start = 0; b = 0; doneAt = 0; finished = false; minDuration = 3.2;
