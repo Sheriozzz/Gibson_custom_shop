@@ -974,8 +974,33 @@ function updateStageFraming() {
   }
 }
 
-function animate() {
+const PR_MAX = Math.min(window.devicePixelRatio || 1, 2);
+const PR_STEPS = [...new Set([PR_MAX, 1.5, 1.25, 1, 0.85].filter((r) => r <= PR_MAX))];
+let prIndex = 0;
+let ftSamples = [];
+let ftLast = 0;
+let ftHold = 0;
+
+function adaptQuality(now) {
+  if (!window.__csLoaderDone || document.hidden) { ftLast = 0; ftSamples = []; return; }
+  if (ftLast) ftSamples.push(now - ftLast);
+  ftLast = now;
+  if (ftSamples.length < 40 || now < ftHold) return;
+  const sorted = ftSamples.slice().sort((x, y) => x - y);
+  const median = sorted[sorted.length >> 1];
+  ftSamples = [];
+  if (median > 21 && prIndex < PR_STEPS.length - 1) {
+    prIndex++;
+    renderer.setPixelRatio(PR_STEPS[prIndex]);
+    resizeRenderer();
+    if (PR_STEPS[prIndex] <= 1) document.body.classList.add('cs-lite');
+    ftHold = now + 1500;
+  }
+}
+
+function animate(now = performance.now()) {
   requestAnimationFrame(animate);
+  adaptQuality(now);
 
   updateStageFraming();
 

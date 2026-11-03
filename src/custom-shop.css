@@ -630,27 +630,17 @@ body:not([data-step="1"]) .cs-dots { display: none; }
 .cs-knobcolor__seg[data-sw="silver"].is-selected { background: #c9ccd3; color: #2a2a2e; }
 .cs-knobcolor__seg.is-selected { border-color: #fff; }
 .cs-panel[data-step="6"] [data-group="knobStyle"].is-selected { background: #424244; }
-html.has-pick, html.has-pick * { cursor: none !important; }
-#cs-pick {
-  position: fixed; left: 0; top: 0; width: 75px; height: 75px;
-  z-index: 2000; pointer-events: none; opacity: 0;
-  transition: opacity 0.2s ease;
-  will-change: transform;
+html.has-pick, html.has-pick * {
+  cursor: url('/pick-1x.png') 17 17, auto !important;
+  cursor: image-set(url('/pick-1x.png') 1x, url('/pick.png') 2x) 17 17, auto !important;
 }
-#cs-pick.is-visible { opacity: 1; }
-#cs-pick img {
-  width: 100%; height: 100%; display: block;
-  transform-origin: 17px 17px;
-  transition: transform 0.18s ease;
+html.has-pick :is(button, a, input, select, textarea, label, [role="button"], .cs-option, .cs-knobcolor__seg, .cs-nav__dot) {
+  cursor: url('/pick-hover-1x.png') 17 17, auto !important;
+  cursor: image-set(url('/pick-hover-1x.png') 1x, url('/pick-hover.png') 2x) 17 17, auto !important;
 }
-#cs-pick[data-state="hover"] img { transform: scale(1.0); }
-#cs-pick[data-state="down"] img { transform: scale(0.94); }
-#cs-pick.is-flick img { animation: cs-pick-flick 0.5s cubic-bezier(0.2, 0.8, 0.3, 1); }
-@keyframes cs-pick-flick {
-  0%   { transform: rotate(0) scale(0.92); }
-  35%  { transform: rotate(-26deg) scale(1.12); }
-  70%  { transform: rotate(8deg) scale(1.02); }
-  100% { transform: rotate(0) scale(1); }
+html.has-pick *:active {
+  cursor: url('/pick-click-1x.png') 17 17, auto !important;
+  cursor: image-set(url('/pick-click-1x.png') 1x, url('/pick-click.png') 2x) 17 17, auto !important;
 }
 .cs-summary div { gap: 24px; align-items: flex-start; }
 .cs-summary dt { flex: 0 0 auto; }
@@ -922,3 +912,6 @@ body:not([data-step]) .cs-hint__label, body[data-step="1"] .cs-hint__label { opa
   .cs-home { top: 6px; left: max(6px, env(safe-area-inset-left)); height: 32px; padding: 0 8px; }
   .cs-home svg { width: 16px; height: 16px; }
 }
+
+body.cs-lite .cs-panel { background: linear-gradient(155deg, rgba(255,255,255,0.07), rgba(255,255,255,0) 38%), rgba(22,22,22,0.92); }
+body.cs-lite *, body.cs-lite *::before, body.cs-lite *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
